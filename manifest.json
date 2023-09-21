@@ -10,5 +10,13 @@
   "background": {
     "service_worker": "service-worker.js"
   },
-  "permissions": ["tabCapture", "offscreen", "scripting"]
+  "commands": {
+    "enable-capture": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "Enable the SbPAM session for the current tab"
+    }
+  },
+  "permissions": ["tabCapture", "offscreen", "scripting", "activeTab"]
 }

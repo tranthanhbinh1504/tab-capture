@@ -1,9 +1,4 @@
-const setupOffscreenDocument = async () => {
-  // Get current tab to focus on it after start recording on recording screen tab
-  let queryOptions = { active: true, lastFocusedWindow: true };
-  // `tab` will either be a `tabs.Tab` instance or `undefined`.
-  let [tab] = await chrome.tabs.query(queryOptions);
-
+const setupOffscreenDocument = async (tab) => {
   const existingContexts = await chrome.runtime.getContexts({});
   let recording = false;
 
@@ -42,12 +37,43 @@ const setupOffscreenDocument = async () => {
   });
 };
 
-const openLinkedin = async () => {
-  const newTab = await chrome.tabs.create({
-    url: "https://www.linkedin.com/",
-  });
+const audioRecordNewTab = async (newTab) => {
+  debugger;
+  const tabId = newTab.id;
+  chrome.tabCapture.getMediaStreamId({ targetTabId: tabId }, async (id) => {
+    const media = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        mandatory: {
+          chromeMediaSource: "tab",
+          chromeMediaSourceId: id,
+        },
+      },
+      video: {
+        mandatory: {
+          chromeMediaSource: "tab",
+          chromeMediaSourceId: id,
+        },
+      },
+    });
 
-  setupOffscreenDocument();
+    // Continue to play the captured audio to the user.
+    const output = new AudioContext();
+    const source = output.createMediaStreamSource(media);
+    source.connect(output.destination);
+  });
+};
+
+const openLinkedin = async () => {
+  const a = await chrome.tabs.create({ url: "https://www.linkedin.com/" });
+  // console.log(a);
+  // setupOffscreenDocument(a);
+
+  // setupOffscreenDocument();
+
+  // const newTab = await chrome.tabs.create({
+  //   url: "https://www.linkedin.com/",
+  // });
+  // audioRecordNewTab(newTab);
 };
 
 const openWikipedia = async () => {
@@ -66,4 +92,15 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.name === "openWikipedia") {
     openWikipedia();
   }
+});
+
+chrome.commands.onCommand.addListener(async (command, tab) => {
+  if (command === "enable-capture") {
+    setupOffscreenDocument(tab);
+  }
+});
+
+chrome.action.onClicked.addListener(async (tab) => {
+  console.log("run");
+  setupOffscreenDocument(tab);
 });
