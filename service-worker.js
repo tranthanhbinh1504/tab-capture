@@ -42,26 +42,13 @@ const setupOffscreenDocument = async (tab) => {
 };
 
 const openLinkedin = async () => {
-  // await chrome.tabs.create({ url: "https://www.linkedin.com/" });
-  const key = "a";
-  const eventKeyBoard = new KeyboardEvent("keydown", { key, metaKey: true });
-  console.log(eventKeyBoard);
-  // const currentTab = await chrome.tabs.query({
-  //   currentWindow: true,
-  //   active: true,
-  // });
-  // setupOffscreenDocument(currentTab[0]);
+  await chrome.tabs.create({ url: "https://www.linkedin.com/" });
 };
 
 const openWikipedia = async () => {
   await chrome.tabs.create({
     url: "https://www.wikipedia.com/",
   });
-  // const currentTab = await chrome.tabs.query({
-  //   currentWindow: true,
-  //   active: true,
-  // });
-  // setupOffscreenDocument(currentTab[0]);
 };
 
 // Listen for startRecording message from popup.js
