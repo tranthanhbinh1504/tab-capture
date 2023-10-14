@@ -18,5 +18,13 @@
       "description": "Enable the SbPAM session for the current tab"
     }
   },
-  "permissions": ["tabCapture", "offscreen", "scripting", "activeTab"]
+  "permissions": ["tabCapture", "offscreen", "scripting", "activeTab"],
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["http://*/*", "https://*/*", "file://*/*"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ]
 }

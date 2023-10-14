@@ -25,62 +25,43 @@ const setupOffscreenDocument = async (tab) => {
     return;
   }
 
-  const streamId = await chrome.tabCapture.getMediaStreamId({
-    targetTabId: tab.id,
-  });
-
-  // Send the stream ID to the offscreen document to start recording.
-  chrome.runtime.sendMessage({
-    type: "start-recording",
-    target: "offscreen",
-    data: streamId,
-  });
-};
-
-const audioRecordNewTab = async (newTab) => {
-  debugger;
-  const tabId = newTab.id;
-  chrome.tabCapture.getMediaStreamId({ targetTabId: tabId }, async (id) => {
-    const media = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
-          chromeMediaSource: "tab",
-          chromeMediaSourceId: id,
-        },
-      },
-      video: {
-        mandatory: {
-          chromeMediaSource: "tab",
-          chromeMediaSourceId: id,
-        },
-      },
+  try {
+    const streamId = await chrome.tabCapture.getMediaStreamId({
+      targetTabId: tab.id,
     });
 
-    // Continue to play the captured audio to the user.
-    const output = new AudioContext();
-    const source = output.createMediaStreamSource(media);
-    source.connect(output.destination);
-  });
+    // Send the stream ID to the offscreen document to start recording.
+    chrome.runtime.sendMessage({
+      type: "start-recording",
+      target: "offscreen",
+      data: streamId,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const openLinkedin = async () => {
-  const a = await chrome.tabs.create({ url: "https://www.linkedin.com/" });
-  // console.log(a);
-  // setupOffscreenDocument(a);
-
-  // setupOffscreenDocument();
-
-  // const newTab = await chrome.tabs.create({
-  //   url: "https://www.linkedin.com/",
+  // await chrome.tabs.create({ url: "https://www.linkedin.com/" });
+  const key = "a";
+  const eventKeyBoard = new KeyboardEvent("keydown", { key, metaKey: true });
+  console.log(eventKeyBoard);
+  // const currentTab = await chrome.tabs.query({
+  //   currentWindow: true,
+  //   active: true,
   // });
-  // audioRecordNewTab(newTab);
+  // setupOffscreenDocument(currentTab[0]);
 };
 
 const openWikipedia = async () => {
-  const newTab = await chrome.tabs.create({
+  await chrome.tabs.create({
     url: "https://www.wikipedia.com/",
   });
-  // setupOffscreenDocument();
+  // const currentTab = await chrome.tabs.query({
+  //   currentWindow: true,
+  //   active: true,
+  // });
+  // setupOffscreenDocument(currentTab[0]);
 };
 
 // Listen for startRecording message from popup.js
@@ -98,9 +79,4 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
   if (command === "enable-capture") {
     setupOffscreenDocument(tab);
   }
-});
-
-chrome.action.onClicked.addListener(async (tab) => {
-  console.log("run");
-  setupOffscreenDocument(tab);
 });
