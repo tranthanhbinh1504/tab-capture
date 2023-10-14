@@ -41,29 +41,9 @@ const setupOffscreenDocument = async (tab) => {
   }
 };
 
-const openLinkedin = async () => {
-  await chrome.tabs.create({ url: "https://www.linkedin.com/" });
-};
-
-const openWikipedia = async () => {
-  await chrome.tabs.create({
-    url: "https://www.wikipedia.com/",
-  });
-};
-
 // Listen for startRecording message from popup.js
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  if (request.name === "openLinkedin") {
-    openLinkedin();
-  }
-
-  if (request.name === "openWikipedia") {
-    openWikipedia();
-  }
-});
-
-chrome.commands.onCommand.addListener(async (command, tab) => {
-  if (command === "enable-capture") {
-    setupOffscreenDocument(tab);
+  if (request.type === "tabRecord") {
+    setupOffscreenDocument(request.tab);
   }
 });
