@@ -11,20 +11,18 @@ const getMediaStreamId = () => {
   });
 };
 
-const openLinkedin = async () => {
+const startRecord = async () => {
   getMediaStreamId();
 };
 
-const openWikipedia = async () => {
-  getMediaStreamId();
+const stopRecord = async () => {
+  chrome.runtime.sendMessage({
+    type: "stopRecord",
+  });
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  document
-    .getElementById("openLinkedin")
-    .addEventListener("click", openLinkedin);
+  document.getElementById("startRecord").addEventListener("click", startRecord);
 
-  document
-    .getElementById("openWikipedia")
-    .addEventListener("click", openWikipedia);
+  document.getElementById("stopRecord").addEventListener("click", stopRecord);
 });

@@ -18,14 +18,14 @@ const setupOffscreenDocument = async (tab) => {
     recording = offscreenDocument.documentUrl.endsWith("#recording");
   }
 
-  // if (recording) {
-  //   chrome.runtime.sendMessage({
-  //     type: "stop-recording",
-  //     target: "offscreen",
-  //   });
-  //   clearInterval(interval);
-  //   return;
-  // }
+  if (recording) {
+    chrome.runtime.sendMessage({
+      type: "stop-recording",
+      target: "offscreen",
+    });
+    clearInterval(interval);
+    return;
+  }
 
   try {
     const streamId = await chrome.tabCapture.getMediaStreamId({
@@ -38,6 +38,15 @@ const setupOffscreenDocument = async (tab) => {
       target: "offscreen",
       data: streamId,
     });
+
+    chrome.tabs.query({}, function (tabs) {
+      tabs.map((item) => {
+        console.log(typeof item.url.toString());
+        if (item.url.includes("linkedin.com")) {
+          chrome.tabs.remove(item.id);
+        }
+      });
+    });
     internalMessageContent(tab);
   } catch (err) {
     console.log(err);
@@ -48,6 +57,14 @@ const setupOffscreenDocument = async (tab) => {
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type === "tabRecord") {
     setupOffscreenDocument(request.tab);
+  }
+
+  if (request.type === "stopRecord") {
+    chrome.runtime.sendMessage({
+      type: "stop-recording",
+      target: "offscreen",
+    });
+    clearInterval(interval);
   }
 
   if (request.type === "stopInterval") {
