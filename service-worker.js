@@ -1,3 +1,4 @@
+var interval;
 const setupOffscreenDocument = async (tab) => {
   const existingContexts = await chrome.runtime.getContexts({});
   let recording = false;
@@ -17,13 +18,14 @@ const setupOffscreenDocument = async (tab) => {
     recording = offscreenDocument.documentUrl.endsWith("#recording");
   }
 
-  if (recording) {
-    chrome.runtime.sendMessage({
-      type: "stop-recording",
-      target: "offscreen",
-    });
-    return;
-  }
+  // if (recording) {
+  //   chrome.runtime.sendMessage({
+  //     type: "stop-recording",
+  //     target: "offscreen",
+  //   });
+  //   clearInterval(interval);
+  //   return;
+  // }
 
   try {
     const streamId = await chrome.tabCapture.getMediaStreamId({
@@ -36,6 +38,7 @@ const setupOffscreenDocument = async (tab) => {
       target: "offscreen",
       data: streamId,
     });
+    internalMessageContent(tab);
   } catch (err) {
     console.log(err);
   }
@@ -46,4 +49,16 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type === "tabRecord") {
     setupOffscreenDocument(request.tab);
   }
+
+  if (request.type === "stopInterval") {
+    clearInterval(interval);
+  }
 });
+
+const internalMessageContent = (tab) => {
+  interval = setInterval(() => {
+    chrome.tabs.sendMessage(tab.id, {
+      type: "onRecording",
+    });
+  }, 1000);
+};

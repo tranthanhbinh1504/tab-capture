@@ -19,10 +19,11 @@
     }
   },
   "permissions": ["tabCapture", "offscreen", "scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
       "js": ["content.js"],
-      "matches": ["http://*/*", "https://*/*", "file://*/*"],
+      "matches": ["<all_urls>"],
       "run_at": "document_start",
       "all_frames": true
     }

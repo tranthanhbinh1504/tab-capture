@@ -13,8 +13,6 @@
 // limitations under the License.
 
 chrome.runtime.onMessage.addListener(async (message) => {
-  debugger;
-
   if (message.target === "offscreen") {
     switch (message.type) {
       case "start-recording":
@@ -32,7 +30,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
 let recorder;
 let data = [];
 
-async function startRecording(streamId) {
+async function startRecording(streamId, tab) {
   if (recorder?.state === "recording") {
     throw new Error("Called startRecording while recording is in progress.");
   }
@@ -61,6 +59,7 @@ async function startRecording(streamId) {
   recorder = new MediaRecorder(media, { mimeType: "video/webm" });
   recorder.ondataavailable = (event) => data.push(event.data);
   recorder.onstop = () => {
+    chrome.runtime.sendMessage({ type: "stopInterval" });
     const blob = new Blob(data, { type: "video/webm" });
     window.open(URL.createObjectURL(blob), "_blank");
 
