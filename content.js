@@ -1,6 +1,5 @@
 function onRecording() {
   window.location.assign("https://www.linkedin.com/");
-  console.log("run");
   chrome.runtime.sendMessage({ type: "stopInterval" });
 }
 
